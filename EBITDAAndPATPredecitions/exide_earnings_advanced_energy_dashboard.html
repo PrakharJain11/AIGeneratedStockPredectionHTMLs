@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exide Industries - Master Earnings Intelligence & Advanced Energy Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        emerald: {
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Embedded Chart Container Styles for Strict Layout Limits -->
+    <style>
+        /* Chosen Palette: Slate & Amber Energy (Warm neutral slate background #f8fafc, deep slate text #0f172a, emerald green #059669 for core margins/growth, warm amber #d97706 for EV/Lithium, blue #2563eb for industrial/BESS) */
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 320px;
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 380px;
+            }
+        }
+        /* Hide scrollbars for clean UI while keeping scrollability */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<!-- Application Structure Plan: The SPA is organized into 7 functional thematic tabs rather than a static document order. Users can seamlessly jump from executive summaries to an interactive 8-quarter financial model, competitive moat visualizations, interactive scenario calculators, broker disagreement breakdowns, and investor Q&A. This layout enables decision-makers to evaluate both near-term quarterly trajectory and long-term EV gigafactory options interactively. -->
+<!-- Visualization & Content Choices:
+1. Executive Annual Financials -> Bar + Line Combo Chart -> Chart.js Canvas -> Allows comparing top-line revenue scale with bottom-line PAT & EBITDA margins over FY22-FY29E.
+2. 8-Quarter Forecast -> Interactive Bar/Line Switcher Chart -> Chart.js Canvas -> User toggles between Revenue, EBITDA, PAT, and Margin trends.
+3. Competitor Margin Divergence -> Line Chart -> Chart.js Canvas -> Highlights Exide vs Amara Raja margin resilience due to CML recycling moat.
+4. EESL Utilization vs Margin Drag -> Dual Axis / Bar Chart -> Chart.js Canvas -> Shows the relationship between plant ramp-up and EBITDA absorption.
+5. Interactive Scenario Simulator -> HTML Sliders + Vanilla JS calculation -> Dynamic DOM updates -> Enables stress-testing lead costs and capacity utilization.
+6. Broker Dispersion & Sentiment -> Structured HTML Cards + Visual Meter Gauges -> CSS/Unicode -> Clarifies ICICI vs MOFSL debate cleanly.
+7. Investor Q&A -> Filterable Accordions -> JS Event Listeners -> Quick answer retrieval for specific financial questions.
+-->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-amber-500 selection:text-white min-h-screen flex flex-col">
+
+    <!-- Top Banner & Ticker Header -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-amber-500 to-emerald-500 flex items-center justify-center font-bold text-slate-900 text-xl shadow-inner">
+                        ⚡
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="text-xl font-extrabold tracking-tight">EXIDE INDUSTRIES</h1>
+                            <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-slate-800 text-amber-400 border border-amber-500/30">NSE: EXIDEIND</span>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/30">ACC Cell Inflection</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Master Financial Intelligence & 8-Quarter Forecast Model (FY27E - FY29E)</p>
+                    </div>
+                </div>
+
+                <!-- Fast KPI Metric Badges -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono">
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase">FY26-28E PAT CAGR</span>
+                        <span class="text-emerald-400 font-bold text-sm">+25.46%</span>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase">FY28E Revenue</span>
+                        <span class="text-amber-400 font-bold text-sm">₹23,700 Cr</span>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase">FY28E EBITDA Margin</span>
+                        <span class="text-emerald-400 font-bold text-sm">12.49%</span>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase">Gigafactory Status</span>
+                        <span class="text-sky-400 font-bold text-sm">Phase 1 (6 GWh) Ready</span>
+                    </div>
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-lg px-3 py-1.5 flex flex-col">
+                        <span class="text-slate-400 text-[10px] uppercase">Balance Sheet</span>
+                        <span class="text-slate-200 font-bold text-sm">₹0 Net Debt</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="bg-slate-950 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex space-x-1 overflow-x-auto no-scrollbar py-1 text-sm font-medium">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-amber-400 bg-slate-800 border-b-2 border-amber-400">
+                        📊 Executive Overview
+                    </button>
+                    <button onclick="switchTab('forecast')" id="tab-forecast" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        📈 8-Quarter Forecast
+                    </button>
+                    <button onclick="switchTab('moat')" id="tab-moat" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        🛡️ Moat & Competitors
+                    </button>
+                    <button onclick="switchTab('gigafactory')" id="tab-gigafactory" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        🔋 EESL Gigafactory & Capex
+                    </button>
+                    <button onclick="switchTab('intelligence')" id="tab-intelligence" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        🔍 Broker & Alternative Data
+                    </button>
+                    <button onclick="switchTab('simulator')" id="tab-simulator" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        ⚙️ Scenario Simulator
+                    </button>
+                    <button onclick="switchTab('faq')" id="tab-faq" class="tab-btn px-4 py-2 rounded-md whitespace-nowrap transition-all duration-150 text-slate-300 hover:text-white hover:bg-slate-850">
+                        ❓ Investor Q&A (12 Keys)
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Body -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- ==================================================================== -->
+        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <!-- ==================================================================== -->
+        <section id="sec-overview" class="tab-content space-y-6">
+            
+            <!-- Introductory Context Paragraph -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span>🚀</span> Executive Summary & Thesis Context
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Exide Industries (EXIDEIND) is navigating a profound structural inflection point: actively funding its transition from a legacy lead-acid leader into an advanced chemistry cell (ACC) energy storage powerhouse. Fueled by high cash generation in core automotive aftermarket and PM Surya Ghar solar BESS demand, Exide is capitalizing its 12 GWh Bengaluru Gigafactory through subsidiary <strong>Exide Energy Solutions Limited (EESL)</strong> without incurring debt. Core lead recycling via Chloride Metals Limited (CML) protects EBITDA margins against commodity shocks, creating a widening execution gap against primary competitor Amara Raja.
+                </p>
+            </div>
+
+            <!-- Key Investment Drivers Highlights Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-amber-400 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded">Primary Growth Vector</span>
+                        <span class="text-xl">🚗</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900">Auto Aftermarket & OEM Boom</h3>
+                    <p class="text-xs text-slate-600 mt-1">Post-COVID vehicle sales boom entering primary replacement window (2.5-3 yr cycle). OEM volumes growing >25% YoY with 4-wheel replacement up 10%.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-emerald-400 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded">Macro Policy Catalyst</span>
+                        <span class="text-xl">☀️</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900">PM Surya Ghar BESS Expansion</h3>
+                    <p class="text-xs text-slate-600 mt-1">₹75,021 Cr scheme targeting 1 Cr residential rooftop solar installations. Unlocks massive multi-year stationary storage battery demand run-rate (>₹400 Cr/qtr).</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm hover:border-sky-400 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-semibold text-sky-700 bg-sky-50 px-2 py-1 rounded">Strategic Moat</span>
+                        <span class="text-xl">♻️</span>
+                    </div>
+                    <h3 class="font-bold text-slate-900">CML Recycling Insulation</h3>
+                    <p class="text-xs text-slate-600 mt-1">Chloride Metals Ltd provides 75-80% of internal lead requirements via 3 recycling plants (346 KMT). Insulates gross margins during MCX lead price spikes.</p>
+                </div>
+            </div>
+
+            <!-- Consolidated Financial Performance & Trajectory Chart -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-slate-100 gap-2">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Consolidated Annual Trajectory (FY22 - FY29E)</h3>
+                        <p class="text-xs text-slate-500">Revenue scaling from ₹12,789 Cr to ₹27,250 Cr with structural EBITDA margin expansion to 13.2%</p>
+                    </div>
+                    <div class="flex items-center space-x-3 text-xs font-semibold">
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-slate-800 rounded-sm"></span> Revenue (₹ Cr)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-emerald-600 rounded-sm"></span> PAT (₹ Cr)</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-500 rounded-full"></span> EBITDA Margin %</span>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="annualOverviewChart"></canvas>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2 italic text-right">*Note: FY22 PAT includes exceptional one-off gain of ₹4,357 Cr from Exide Life Insurance divestment to HDFC Life.</p>
+            </div>
+
+            <!-- Key Financial Metrics Table Summary -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-900 mb-3">Multi-Year Financial Summary Table (₹ Crore)</h3>
+                <table class="w-full text-xs text-left border-collapse font-mono">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-2.5 font-bold">Metric</th>
+                            <th class="p-2.5 text-right">FY22</th>
+                            <th class="p-2.5 text-right">FY23</th>
+                            <th class="p-2.5 text-right">FY24</th>
+                            <th class="p-2.5 text-right">FY25</th>
+                            <th class="p-2.5 text-right">FY26</th>
+                            <th class="p-2.5 text-right bg-amber-50 font-bold text-amber-900">FY27E</th>
+                            <th class="p-2.5 text-right bg-emerald-50 font-bold text-emerald-900">FY28E</th>
+                            <th class="p-2.5 text-right bg-sky-50 font-bold text-sky-900">FY29E</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Consolidated Revenue</td>
+                            <td class="p-2.5 text-right">12,789</td>
+                            <td class="p-2.5 text-right">15,078</td>
+                            <td class="p-2.5 text-right">16,770</td>
+                            <td class="p-2.5 text-right">17,238</td>
+                            <td class="p-2.5 text-right">17,995</td>
+                            <td class="p-2.5 text-right bg-amber-50 font-bold">20,778</td>
+                            <td class="p-2.5 text-right bg-emerald-50 font-bold">23,700</td>
+                            <td class="p-2.5 text-right bg-sky-50 font-bold">27,250</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Revenue YoY Growth</td>
+                            <td class="p-2.5 text-right text-slate-500">23.45%</td>
+                            <td class="p-2.5 text-right text-slate-500">17.89%</td>
+                            <td class="p-2.5 text-right text-slate-500">11.22%</td>
+                            <td class="p-2.5 text-right text-slate-500">2.79%</td>
+                            <td class="p-2.5 text-right text-slate-500">4.39%</td>
+                            <td class="p-2.5 text-right bg-amber-50 text-emerald-700 font-bold">+15.46%</td>
+                            <td class="p-2.5 text-right bg-emerald-50 text-emerald-700 font-bold">+14.06%</td>
+                            <td class="p-2.5 text-right bg-sky-50 text-emerald-700 font-bold">+14.97%</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">EBITDA</td>
+                            <td class="p-2.5 text-right">1,402</td>
+                            <td class="p-2.5 text-right">1,593</td>
+                            <td class="p-2.5 text-right">1,823</td>
+                            <td class="p-2.5 text-right">1,805</td>
+                            <td class="p-2.5 text-right">1,876</td>
+                            <td class="p-2.5 text-right bg-amber-50 font-bold">2,451</td>
+                            <td class="p-2.5 text-right bg-emerald-50 font-bold">2,962</td>
+                            <td class="p-2.5 text-right bg-sky-50 font-bold">3,597</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">EBITDA Margin</td>
+                            <td class="p-2.5 text-right">10.96%</td>
+                            <td class="p-2.5 text-right">10.56%</td>
+                            <td class="p-2.5 text-right">10.87%</td>
+                            <td class="p-2.5 text-right">10.47%</td>
+                            <td class="p-2.5 text-right">10.42%</td>
+                            <td class="p-2.5 text-right bg-amber-50 font-bold">11.79%</td>
+                            <td class="p-2.5 text-right bg-emerald-50 font-bold">12.49%</td>
+                            <td class="p-2.5 text-right bg-sky-50 font-bold">13.20%</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">PAT</td>
+                            <td class="p-2.5 text-right text-slate-400">4,357*</td>
+                            <td class="p-2.5 text-right">823</td>
+                            <td class="p-2.5 text-right">883</td>
+                            <td class="p-2.5 text-right">800</td>
+                            <td class="p-2.5 text-right">860</td>
+                            <td class="p-2.5 text-right bg-amber-50 font-bold text-emerald-700">1,351</td>
+                            <td class="p-2.5 text-right bg-emerald-50 font-bold text-emerald-700">1,695</td>
+                            <td class="p-2.5 text-right bg-sky-50 font-bold text-emerald-700">2,120</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Diluted EPS (₹)</td>
+                            <td class="p-2.5 text-right">51.38</td>
+                            <td class="p-2.5 text-right">9.68</td>
+                            <td class="p-2.5 text-right">10.31</td>
+                            <td class="p-2.5 text-right">9.35</td>
+                            <td class="p-2.5 text-right">10.05</td>
+                            <td class="p-2.5 text-right bg-amber-50 font-bold">15.89</td>
+                            <td class="p-2.5 text-right bg-emerald-50 font-bold">19.94</td>
+                            <td class="p-2.5 text-right bg-sky-50 font-bold">24.94</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 2: 8-QUARTER FORECAST EXPLORER -->
+        <!-- ==================================================================== -->
+        <section id="sec-forecast" class="tab-content space-y-6 hidden">
+            
+            <!-- Context Rationale -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <span>📈</span> 8-Quarter Forward Forecast Engine (Q2 FY27E - Q1 FY29E)
+                        </h2>
+                        <p class="text-xs text-slate-600 mt-1">
+                            High confidence in near-term quarters driven by Q1 FY27 momentum and summer inverter battery seasonality. Far-term quarters reflect EESL capacity scaling absorption.
+                        </p>
+                    </div>
+
+                    <!-- Metric Selector Buttons -->
+                    <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-semibold self-start md:self-auto">
+                        <button onclick="updateQuarterlyChart('revenue')" id="btn-q-revenue" class="q-btn px-3 py-1.5 rounded-md bg-white text-slate-900 shadow-sm">Revenue</button>
+                        <button onclick="updateQuarterlyChart('ebitda')" id="btn-q-ebitda" class="q-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">EBITDA</button>
+                        <button onclick="updateQuarterlyChart('pat')" id="btn-q-pat" class="q-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">PAT</button>
+                        <button onclick="updateQuarterlyChart('growth')" id="btn-q-growth" class="q-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">YoY Growth %</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Quarterly Chart Container -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                    <h3 id="quarterlyChartTitle" class="text-sm font-bold text-slate-900">Quarterly Consolidated Revenue Trajectory (₹ Cr)</h3>
+                    <span class="text-xs text-slate-400 font-mono">Q1 FY26 Actual to Q1 FY29 Forecast</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="quarterlyForecastChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Full 8-Quarter Forecast Detailed Table -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-900 mb-3">Granular 8-Quarter Forecast Breakdown</h3>
+                <table class="w-full text-xs border-collapse font-mono">
+                    <thead>
+                        <tr class="bg-slate-900 text-white">
+                            <th class="p-2.5 text-left font-sans">Quarter</th>
+                            <th class="p-2.5 text-center">Period</th>
+                            <th class="p-2.5 text-right">Revenue (₹Cr)</th>
+                            <th class="p-2.5 text-right">Rev YoY %</th>
+                            <th class="p-2.5 text-right">EBITDA (₹Cr)</th>
+                            <th class="p-2.5 text-right">EBITDA YoY %</th>
+                            <th class="p-2.5 text-right">EBITDA Margin</th>
+                            <th class="p-2.5 text-right">PAT (₹Cr)</th>
+                            <th class="p-2.5 text-right">PAT YoY %</th>
+                            <th class="p-2.5 text-right">PAT Margin</th>
+                            <th class="p-2.5 text-right">EPS (₹)</th>
+                            <th class="p-2.5 text-center font-sans">Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-right">
+                        <tr class="bg-slate-50 font-semibold">
+                            <td class="p-2 text-left font-sans text-slate-900">Q1 FY27 (Actual)</td>
+                            <td class="p-2 text-center text-slate-500">Jun-26</td>
+                            <td class="p-2">5,528</td>
+                            <td class="p-2 text-emerald-600">+17.75%</td>
+                            <td class="p-2">621</td>
+                            <td class="p-2 text-emerald-600">+15.42%</td>
+                            <td class="p-2">11.23%</td>
+                            <td class="p-2">351</td>
+                            <td class="p-2 text-emerald-600">+27.63%</td>
+                            <td class="p-2">6.34%</td>
+                            <td class="p-2">4.12</td>
+                            <td class="p-2 text-center"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">ACTUAL</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q2 FY27E</td>
+                            <td class="p-2 text-center text-slate-500">Sep-26</td>
+                            <td class="p-2 font-bold">5,050</td>
+                            <td class="p-2 text-emerald-600">+15.69%</td>
+                            <td class="p-2 font-bold">606</td>
+                            <td class="p-2 text-emerald-600 font-bold">+54.98%*</td>
+                            <td class="p-2">12.00%</td>
+                            <td class="p-2 font-bold">330</td>
+                            <td class="p-2 text-emerald-600 font-bold">+89.65%*</td>
+                            <td class="p-2">6.53%</td>
+                            <td class="p-2">3.88</td>
+                            <td class="p-2 text-center"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">HIGH</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q3 FY27E</td>
+                            <td class="p-2 text-center text-slate-500">Dec-26</td>
+                            <td class="p-2 font-bold">4,800</td>
+                            <td class="p-2 text-emerald-600">+14.25%</td>
+                            <td class="p-2 font-bold">576</td>
+                            <td class="p-2 text-emerald-600">+27.43%</td>
+                            <td class="p-2">12.00%</td>
+                            <td class="p-2 font-bold">310</td>
+                            <td class="p-2 text-emerald-600">+58.97%</td>
+                            <td class="p-2">6.45%</td>
+                            <td class="p-2">3.64</td>
+                            <td class="p-2 text-center"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">HIGH</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q4 FY27E</td>
+                            <td class="p-2 text-center text-slate-500">Mar-27</td>
+                            <td class="p-2 font-bold">5,400</td>
+                            <td class="p-2 text-emerald-600">+14.04%</td>
+                            <td class="p-2 font-bold">648</td>
+                            <td class="p-2 text-emerald-600">+32.78%</td>
+                            <td class="p-2">12.00%</td>
+                            <td class="p-2 font-bold">360</td>
+                            <td class="p-2 text-emerald-600">+65.89%</td>
+                            <td class="p-2">6.66%</td>
+                            <td class="p-2">4.23</td>
+                            <td class="p-2 text-center"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">HIGH</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q1 FY28E</td>
+                            <td class="p-2 text-center text-slate-500">Jun-27</td>
+                            <td class="p-2 font-bold">6,200</td>
+                            <td class="p-2 text-emerald-600">+12.15%</td>
+                            <td class="p-2 font-bold">775</td>
+                            <td class="p-2 text-emerald-600">+24.79%</td>
+                            <td class="p-2">12.50%</td>
+                            <td class="p-2 font-bold">450</td>
+                            <td class="p-2 text-emerald-600">+28.20%</td>
+                            <td class="p-2">7.25%</td>
+                            <td class="p-2">5.29</td>
+                            <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">MEDIUM</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q2 FY28E</td>
+                            <td class="p-2 text-center text-slate-500">Sep-27</td>
+                            <td class="p-2 font-bold">5,800</td>
+                            <td class="p-2 text-emerald-600">+14.85%</td>
+                            <td class="p-2 font-bold">725</td>
+                            <td class="p-2 text-emerald-600">+19.63%</td>
+                            <td class="p-2">12.50%</td>
+                            <td class="p-2 font-bold">410</td>
+                            <td class="p-2 text-emerald-600">+24.24%</td>
+                            <td class="p-2">7.06%</td>
+                            <td class="p-2">4.82</td>
+                            <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">MEDIUM</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q3 FY28E</td>
+                            <td class="p-2 text-center text-slate-500">Dec-27</td>
+                            <td class="p-2 font-bold">5,500</td>
+                            <td class="p-2 text-emerald-600">+14.58%</td>
+                            <td class="p-2 font-bold">687</td>
+                            <td class="p-2 text-emerald-600">+19.27%</td>
+                            <td class="p-2">12.50%</td>
+                            <td class="p-2 font-bold">390</td>
+                            <td class="p-2 text-emerald-600">+25.80%</td>
+                            <td class="p-2">7.09%</td>
+                            <td class="p-2">4.58</td>
+                            <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">MEDIUM</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q4 FY28E</td>
+                            <td class="p-2 text-center text-slate-500">Mar-28</td>
+                            <td class="p-2 font-bold">6,200</td>
+                            <td class="p-2 text-emerald-600">+14.81%</td>
+                            <td class="p-2 font-bold">775</td>
+                            <td class="p-2 text-emerald-600">+19.59%</td>
+                            <td class="p-2">12.50%</td>
+                            <td class="p-2 font-bold">445</td>
+                            <td class="p-2 text-emerald-600">+23.61%</td>
+                            <td class="p-2">7.17%</td>
+                            <td class="p-2">5.23</td>
+                            <td class="p-2 text-center"><span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">MEDIUM</span></td>
+                        </tr>
+                        <tr class="hover:bg-amber-50/50">
+                            <td class="p-2 text-left font-sans font-medium text-slate-900">Q1 FY29E</td>
+                            <td class="p-2 text-center text-slate-500">Jun-28</td>
+                            <td class="p-2 font-bold">6,900</td>
+                            <td class="p-2 text-emerald-600">+11.29%</td>
+                            <td class="p-2 font-bold">897</td>
+                            <td class="p-2 text-emerald-600">+15.74%</td>
+                            <td class="p-2">13.00%</td>
+                            <td class="p-2 font-bold">520</td>
+                            <td class="p-2 text-emerald-600">+15.55%</td>
+                            <td class="p-2">7.53%</td>
+                            <td class="p-2">6.11</td>
+                            <td class="p-2 text-center"><span class="bg-slate-200 text-slate-800 text-[10px] px-2 py-0.5 rounded font-sans font-bold">LOW</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="text-[11px] text-slate-500 mt-2 italic">*Note: Q2 FY27E YoY growth metrics appear exceptionally high due to the depressed base of Q2 FY26 (where EBITDA fell to ₹391 Cr and PAT to ₹174 Cr due to delayed raw material price pass-through).</p>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 3: COMPETITOR & RECYCLING MOAT ANALYSIS -->
+        <!-- ==================================================================== -->
+        <section id="sec-moat" class="tab-content space-y-6 hidden">
+            
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span>🛡️</span> Strategic Moat: Chloride Metals Ltd & Competitor Divergence
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    While market peer Amara Raja suffered margin compression in Q1 FY27 (EBITDA margins down 106 bps YoY to 9.6%), Exide's standalone EBITDA margins <strong>expanded 20 bps to 12.4%</strong>. This operational divergence proves that Exide's earnings trajectory is company-specific, fortified by its wholly-owned subsidiary <strong>Chloride Metals Limited (CML)</strong>.
+                </p>
+            </div>
+
+            <!-- Comparison Chart + Moat Card Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Competitor Chart Container -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">Standalone EBITDA Margin Trajectory (%)</h3>
+                    <p class="text-xs text-slate-500 mb-3">Exide vs Amara Raja: Demonstrating CML lead recycling insulation</p>
+                    <div class="chart-container">
+                        <canvas id="competitorMarginChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- CML Recycling Ecosystem Breakdown -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <h3 class="text-sm font-bold text-slate-900">Chloride Metals Limited (CML) Recycling Shield</h3>
+                            <span class="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">75% - 80% Self-Sufficient</span>
+                        </div>
+
+                        <div class="space-y-3 mt-4 text-xs">
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200/80">
+                                <div class="font-bold text-slate-900">Recycling Infrastructure Capacity</div>
+                                <div class="text-slate-600 mt-0.5">Operates 3 state-of-the-art lead recycling plants with a combined capacity of <strong>346 KMT</strong> per annum.</div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200/80">
+                                <div class="font-bold text-slate-900">Raw Material Insulation Moat</div>
+                                <div class="text-slate-600 mt-0.5">Lead accounts for ~70% of battery raw material costs. CML's closed-loop recycling shields Exide from LME/MCX lead spikes.</div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200/80">
+                                <div class="font-bold text-slate-900">Recent MCX Price Tailwind</div>
+                                <div class="text-slate-600 mt-0.5">Recent ~5.5% drop in MCX lead prices provides an additional +30 to +50 bps gross margin tailwind for Q2/Q3 FY27.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+                        <span class="text-slate-500">Market Share (Auto OEM):</span>
+                        <span class="text-slate-900 font-bold">~60% Duopoly Leadership</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Head to Head Competitor Matrix Table -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-900 mb-3">Q1 FY27 Head-to-Head Performance Matrix</h3>
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-2.5 font-bold">Metric / Parameter</th>
+                            <th class="p-2.5 font-bold text-amber-700 bg-amber-50">Exide Industries (Standalone)</th>
+                            <th class="p-2.5 font-bold text-slate-700">Amara Raja Energy & Mobility</th>
+                            <th class="p-2.5 font-bold">Strategic Implication</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 font-mono">
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Revenue (Q1 FY27)</td>
+                            <td class="p-2.5 bg-amber-50/50 font-bold">₹5,305 Cr (+17.6% YoY)</td>
+                            <td class="p-2.5">₹4,214 Cr (+23.9% YoY)</td>
+                            <td class="p-2.5 font-sans text-slate-600">Amara Raja OEM growth strong; Exide aftermarket mix yields higher profitability.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">EBITDA Margin (Q1 FY27)</td>
+                            <td class="p-2.5 bg-amber-50/50 font-bold text-emerald-700">12.4% (+20 bps YoY)</td>
+                            <td class="p-2.5 text-red-600">9.6% (-106 bps YoY)</td>
+                            <td class="p-2.5 font-sans text-slate-600">Stark divergence. Exide expanded margins; Amara Raja suffered RM & freight shocks.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Lead Supply Chain Moat</td>
+                            <td class="p-2.5 bg-amber-50/50 font-bold">75-80% In-house (CML)</td>
+                            <td class="p-2.5 text-slate-500">Substantially External Market</td>
+                            <td class="p-2.5 font-sans text-slate-600">Exide lead recycling acts as a permanent gross margin buffer.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Li-ion Gigafactory Capex</td>
+                            <td class="p-2.5 bg-amber-50/50 font-bold">₹7,000 Cr (12 GWh Total)</td>
+                            <td class="p-2.5 text-slate-500">₹9,500 Cr Planned (16 GWh)</td>
+                            <td class="p-2.5 font-sans text-slate-600">Exide Phase 1 (6 GWh) equipment 100% installed; first-mover commercial advantage.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2.5 font-sans font-medium text-slate-900">Balance Sheet Leverage</td>
+                            <td class="p-2.5 bg-amber-50/50 font-bold text-emerald-700">Zero Net Debt</td>
+                            <td class="p-2.5 text-slate-500">Low Net Debt</td>
+                            <td class="p-2.5 font-sans text-slate-600">Exide funds entire EV pivot via internal cash flow from core lead-acid operations.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 4: EESL GIGAFACTORY & CAPEX TRACKER -->
+        <!-- ==================================================================== -->
+        <section id="sec-gigafactory" class="tab-content space-y-6 hidden">
+            
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span>🔋</span> Exide Energy Solutions Limited (EESL) Bengaluru Gigafactory
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Exide is constructing a 12 GWh multi-phase lithium-ion cell manufacturing plant in Bengaluru. Phase 1 (6 GWh) equipment installation is <strong>100% complete</strong> with commercial sample dispatches underway to major automotive OEMs representing 80-85% of India's EV market. Commercial billing commences in late FY27.
+                </p>
+            </div>
+
+            <!-- Capex Roadmap & Utilization vs Margin Drag Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Capex Breakdown Card -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900 mb-3">Capex Allocation & Execution Status</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1 font-semibold">
+                                    <span>Phase 1 Capex (~₹5,200 Cr)</span>
+                                    <span class="text-emerald-600">Equipment 100% Installed</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div class="bg-emerald-600 h-2.5 rounded-full" style="width: 95%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">₹4,902 Cr already equity-infused by parent Exide Industries.</p>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1 font-semibold">
+                                    <span>FY27 Approved Capex</span>
+                                    <span class="text-amber-600">₹1,400 Cr En-route</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div class="bg-amber-500 h-2.5 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">Finances Phase 1 completion & civil groundwork for Phase 2.</p>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs mb-1 font-semibold">
+                                    <span>Target BOM Localization</span>
+                                    <span class="text-sky-600">50 - 60% by FY29</span>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-full h-2.5">
+                                    <div class="bg-sky-500 h-2.5 rounded-full" style="width: 25%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-500 mt-1">Crucial to absorb imported cell cost pressure against Chinese imports.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-amber-50 border border-amber-200/60 rounded-lg text-xs text-amber-900">
+                        <strong>Key Milestone:</strong> Binding MoU signed with Hyundai & Kia Motors for localized LFP lithium-ion cell supply for their upcoming Indian EV models.
+                    </div>
+                </div>
+
+                <!-- EESL Capacity Scaling vs Depreciation Drag Chart Container -->
+                <div class="lg:col-span-2 bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-900 mb-1">EESL Capacity Utilization vs Depreciation Drag Trajectory</h3>
+                    <p class="text-xs text-slate-500 mb-3">Scaling from 5% in Q3 FY27 to 30% by FY28E absorbs asset depreciation</p>
+                    <div class="chart-container">
+                        <canvas id="eeslRampChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 5: BROKER & ALTERNATIVE DATA INTELLIGENCE -->
+        <!-- ==================================================================== -->
+        <section id="sec-intelligence" class="tab-content space-y-6 hidden">
+            
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span>🔍</span> Institutional Research Disagreement & Alternative Signals
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Institutional analysts agree on the strength of Exide's lead-acid business, but <strong>diverge sharply on EESL's valuation timeline</strong>. ICICI Direct values EESL at 1x Invested Capital (~₹70/sh), whereas Motilal Oswal values EESL strictly at Book Value (₹82/sh) due to skepticism over early ROCE in the face of cheap Chinese imports.
+                </p>
+            </div>
+
+            <!-- Broker Dispersion Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- ICICI Direct Case -->
+                <div class="bg-white rounded-xl p-5 border-l-4 border-emerald-500 border-t border-r border-b border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Bullish / Upward Revision</span>
+                            <h3 class="font-bold text-slate-900 text-base mt-1">ICICI Direct (Shashank Kanodia)</h3>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-500">FY28E Target: Bullish</span>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-2 mt-3 list-disc pl-4">
+                        <li><strong>FY28 Revenue Est:</strong> ₹22,187 Cr | <strong>PAT:</strong> ₹1,701 Cr (EPS: ₹20.0)</li>
+                        <li><strong>Core Lead-Acid:</strong> Valued at 18x PE based on strong aftermarket pricing power.</li>
+                        <li><strong>EESL Gigafactory:</strong> Values at 1x Invested Capital immediately, relying on Hyundai/Kia off-take.</li>
+                        <li><strong>HDFC Life Stake:</strong> Values remaining stake at ₹72/share.</li>
+                    </ul>
+                </div>
+
+                <!-- Motilal Oswal Case -->
+                <div class="bg-white rounded-xl p-5 border-l-4 border-amber-500 border-t border-r border-b border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Cautious / Fair Value</span>
+                            <h3 class="font-bold text-slate-900 text-base mt-1">Motilal Oswal (MOFSL)</h3>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-slate-500">24.4x FY28E PE</span>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-2 mt-3 list-disc pl-4">
+                        <li><strong>Core Business:</strong> Valued strictly at 16x PE.</li>
+                        <li><strong>EESL Gigafactory:</strong> Valued strictly at Book Value (₹82/share) until ROCE exceeds WACC.</li>
+                        <li><strong>Primary Risk Point:</strong> Massive global Chinese cell oversupply collapsing landed LFP prices in India.</li>
+                        <li><strong>Under-modeling Vector:</strong> MOFSL under-models the PM Surya Ghar stationary storage demand.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Alternative Data Intelligence (X, LinkedIn, Forum Analysis) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- X / Twitter -->
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-900">X / Twitter Sentiment</span>
+                        <span class="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">+40 (Bullish)</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Assessed ~1,200 posts post-Q1 FY27. Retail & HNI excitement centered on zero net debt, 17.6% top-line growth, and Hyundai MoU.</p>
+                </div>
+
+                <!-- LinkedIn -->
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-900">LinkedIn Plant Activity</span>
+                        <span class="text-xs font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">+65 (Strong)</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Tier-2 verification confirms aggressive hiring for "BMS Design" & "Cell Testing". EPC contractor posts verify 100% equipment dry runs.</p>
+                </div>
+
+                <!-- ValuePickr Forum -->
+                <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-900">ValuePickr Forum Insights</span>
+                        <span class="text-xs font-mono font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Deep Value Debate</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Key debate: 12V lead-acid auxiliary battery terminal value vs Tesla shift to 12V Li-ion. Hyundai MoU viewed as critical de-risking catalyst.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 6: SCENARIO SIMULATOR & RISK MATRIX -->
+        <!-- ==================================================================== -->
+        <section id="sec-simulator" class="tab-content space-y-6 hidden">
+            
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <span>⚙️</span> Interactive FY28 Earnings Simulator & Stress Tester
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Adjust key operational levers below—EESL Capacity Utilization, Lead Price Shifts, and PM Surya Ghar Solar Storage Penetration—to dynamically model FY28 EBITDA, PAT, and EPS outcomes.
+                </p>
+            </div>
+
+            <!-- Simulator Controls & Output Card -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Sliders Panel -->
+                <div class="lg:col-span-2 bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-5">
+                    <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Operational Inputs</h3>
+                    
+                    <!-- Slider 1: EESL Utilization -->
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <label for="sliderEesl" class="text-slate-800">EESL Phase 1 Capacity Utilization (%):</label>
+                            <span id="valEesl" class="font-mono text-amber-600">25% (Base Case)</span>
+                        </div>
+                        <input type="range" id="sliderEesl" min="5" max="50" step="5" value="25" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="runScenarioSimulation()">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                            <span>5% (Bear Delay)</span>
+                            <span>25% (Base Target)</span>
+                            <span>50% (Bull Acceleration)</span>
+                        </div>
+                    </div>
+
+                    <!-- Slider 2: Lead Price Shift -->
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <label for="sliderLead" class="text-slate-800">LME/MCX Lead Price Variance (%):</label>
+                            <span id="valLead" class="font-mono text-emerald-600">-5% (Softening Tailwind)</span>
+                        </div>
+                        <input type="range" id="sliderLead" min="-10" max="10" step="2.5" value="-5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="runScenarioSimulation()">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                            <span>-10% (High Margin Expansion)</span>
+                            <span>0% (Neutral)</span>
+                            <span>+10% (Margin Friction)</span>
+                        </div>
+                    </div>
+
+                    <!-- Slider 3: BESS Solar Demand -->
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <label for="sliderBess" class="text-slate-800">PM Surya Ghar Solar BESS Penetration:</label>
+                            <span id="valBess" class="font-mono text-sky-600">+15% Growth (Base)</span>
+                        </div>
+                        <input type="range" id="sliderBess" min="0" max="30" step="5" value="15" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500" oninput="runScenarioSimulation()">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                            <span>0% (Subdued Tenders)</span>
+                            <span>+15% (Base Target)</span>
+                            <span>+30% (Massive Adoption)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulation Output Panel -->
+                <div class="bg-slate-900 text-white rounded-xl p-5 shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 bg-slate-800 px-2 py-1 rounded">Simulated FY28E Outputs</span>
+                        <h3 class="text-base font-extrabold mt-2 text-white">Dynamic Forecast Model</h3>
+                        
+                        <div class="mt-5 space-y-4 font-mono">
+                            <div class="border-b border-slate-800 pb-2">
+                                <span class="text-xs text-slate-400 block font-sans">Projected Revenue</span>
+                                <span id="simRev" class="text-xl font-bold text-white">₹23,700 Cr</span>
+                            </div>
+                            <div class="border-b border-slate-800 pb-2">
+                                <span class="text-xs text-slate-400 block font-sans">Projected EBITDA</span>
+                                <span id="simEbitda" class="text-xl font-bold text-amber-400">₹2,962 Cr</span>
+                                <span id="simEbitdaMargin" class="text-xs text-slate-400 block font-sans mt-0.5">(Margin: 12.49%)</span>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-400 block font-sans">Projected Net PAT</span>
+                                <span id="simPat" class="text-2xl font-black text-emerald-400">₹1,695 Cr</span>
+                                <span id="simEps" class="text-xs text-slate-300 block font-sans mt-0.5">Implied EPS: ₹19.94 / share</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-[11px] text-slate-400 border-t border-slate-800 pt-3 italic">
+                        Updates in real-time based on CML lead recycling offset and depreciation absorption logic.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discrete Bear / Base / Bull Scenario Matrix -->
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm overflow-x-auto">
+                <h3 class="text-sm font-bold text-slate-900 mb-3">Probability-Weighted Scenario Breakdown</h3>
+                <table class="w-full text-xs text-left border-collapse font-mono">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                            <th class="p-2.5 font-bold font-sans">Scenario</th>
+                            <th class="p-2.5 text-center font-sans">Probability</th>
+                            <th class="p-2.5 text-right">FY28E Revenue</th>
+                            <th class="p-2.5 text-right">FY28E EBITDA</th>
+                            <th class="p-2.5 text-right">EBITDA Margin</th>
+                            <th class="p-2.5 text-right">FY28E PAT</th>
+                            <th class="p-2.5 font-sans">Key Driving Assumption</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-red-50/40">
+                            <td class="p-2.5 font-sans font-bold text-red-700">Bear Case</td>
+                            <td class="p-2.5 text-center font-sans">20%</td>
+                            <td class="p-2.5 text-right">₹21,500 Cr</td>
+                            <td class="p-2.5 text-right">₹2,472 Cr</td>
+                            <td class="p-2.5 text-right">11.50%</td>
+                            <td class="p-2.5 text-right font-bold text-red-600">₹1,320 Cr</td>
+                            <td class="p-2.5 font-sans text-slate-600">Chinese cell dumping stalls EESL utilization &lt;15%; unabsorbed depreciation crushes PAT.</td>
+                        </tr>
+                        <tr class="bg-amber-50/60 font-semibold">
+                            <td class="p-2.5 font-sans font-bold text-amber-900">Base Case</td>
+                            <td class="p-2.5 text-center font-sans font-bold">65%</td>
+                            <td class="p-2.5 text-right font-bold">₹23,700 Cr</td>
+                            <td class="p-2.5 text-right font-bold">₹2,962 Cr</td>
+                            <td class="p-2.5 text-right font-bold">12.49%</td>
+                            <td class="p-2.5 text-right font-bold text-emerald-700">₹1,695 Cr</td>
+                            <td class="p-2.5 font-sans text-slate-700">EESL commercializes on time (25-30% utilization); PM Surya Ghar BESS offsets cell margin friction.</td>
+                        </tr>
+                        <tr class="hover:bg-emerald-50/40">
+                            <td class="p-2.5 font-sans font-bold text-emerald-700">Bull Case</td>
+                            <td class="p-2.5 text-center font-sans">15%</td>
+                            <td class="p-2.5 text-right">₹25,200 Cr</td>
+                            <td class="p-2.5 text-right">₹3,276 Cr</td>
+                            <td class="p-2.5 text-right">13.00%</td>
+                            <td class="p-2.5 text-right font-bold text-emerald-600">₹1,980 Cr</td>
+                            <td class="p-2.5 font-sans text-slate-600">EESL signs multiple binding OEM off-take contracts exceeding 50% utilization immediately.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- TAB 7: INVESTOR Q&A (12 KEYS ANSWERED) -->
+        <!-- ==================================================================== -->
+        <section id="sec-faq" class="tab-content space-y-6 hidden">
+            
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <span>❓</span> Core Investor Research Q&A (12 Key Questions)
+                        </h2>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Direct, evidence-backed answers addressing earnings growth, margin trends, catalysts, and risk factors.
+                        </p>
+                    </div>
+
+                    <!-- Search Filter Box -->
+                    <div class="w-full md:w-72">
+                        <input type="text" id="faqSearch" placeholder="🔍 Search questions or keywords..." class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500" onkeyup="filterFaqs()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion List -->
+            <div id="faqContainer" class="space-y-3">
+                
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>1. What is the expected Revenue growth for each of the next 8 quarters?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        Revenue is projected to grow consistently in double digits YoY: <strong>15.69%</strong> (Q2 FY27E), <strong>14.25%</strong> (Q3 FY27E), <strong>14.04%</strong> (Q4 FY27E), <strong>12.15%</strong> (Q1 FY28E), <strong>14.85%</strong> (Q2 FY28E), <strong>14.58%</strong> (Q3 FY28E), <strong>14.81%</strong> (Q4 FY28E), and <strong>11.29%</strong> (Q1 FY29E). Driven by aftermarket vehicle replacement, PM Surya Ghar BESS, and EESL scaling.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>2. What is the expected EBITDA growth for each of the next 8 quarters?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        EBITDA growth demonstrates exceptional momentum: <strong>54.98%</strong> (Q2 FY27E), <strong>27.43%</strong> (Q3 FY27E), <strong>32.78%</strong> (Q4 FY27E), <strong>24.79%</strong> (Q1 FY28E), <strong>19.63%</strong> (Q2 FY28E), <strong>19.27%</strong> (Q3 FY28E), <strong>19.59%</strong> (Q4 FY28E), and <strong>15.74%</strong> (Q1 FY29E).
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>3. What is the expected PAT growth for each of the next 8 quarters?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        PAT growth follows the EBITDA surge: <strong>89.65%</strong> (Q2 FY27E), <strong>58.97%</strong> (Q3 FY27E), <strong>65.89%</strong> (Q4 FY27E), <strong>28.20%</strong> (Q1 FY28E), <strong>24.24%</strong> (Q2 FY28E), <strong>25.80%</strong> (Q3 FY28E), <strong>23.61%</strong> (Q4 FY28E), and <strong>15.55%</strong> (Q1 FY29E).
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>4. Which quarter has the highest expected EBITDA & PAT growth?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        <strong>Q2 FY27E holds the highest growth</strong> (+54.98% EBITDA YoY, +89.65% PAT YoY). This is mathematically driven by the exceptionally depressed base of Q2 FY26 (where EBITDA crashed to ₹391 Cr and PAT to ₹174 Cr due to delayed raw material price pass-through).
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>5. Is EBITDA margin expected to expand or contract?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        EBITDA margin is expected to structurally <strong>expand</strong> from the historical ~10.4% base toward <strong>12.49% in FY28E and 13.20% in FY29E</strong>. Secured by lead price softening, CML recycling self-sufficiency, and EESL operating leverage.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>6. Is PAT growth faster or slower than EBITDA growth, and why?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        PAT growth (+57.09% in FY27E) is mathematically <strong>faster</strong> than EBITDA growth (+30.65% in FY27E). Because Exide carries <strong>zero net debt</strong>, zero interest burden dilutes operating cash flow down to PBT, offset only by depreciation from EESL plant capitalization.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>7. What are the principal drivers of expected earnings growth?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        1. Post-pandemic automotive vehicle replacement cycle hitting primary 2.5-3 yr window.<br>
+                        2. PM Surya Ghar Muft Bijli Yojana driving stationary solar battery storage demand.<br>
+                        3. Strategic transition from capex-burn to revenue generation at 12 GWh EESL Bengaluru Gigafactory.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>8. What could cause the forecast to fail?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        Execution delays at the EESL plant. If 6 GWh Phase 1 capacity fails to achieve 25-30% utilization in year 1, unabsorbed depreciation (from ₹5,200 Cr capitalization) will compress consolidated PAT. Chinese LFP cell dumping is the primary external threat.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>9. How does the forecast compare with consensus and guidance?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        Aligned with management's guided 15-16% top-line growth. Consistently 3.5% to 4.5% higher on top-line than traditional broker consensus due to projecting stronger stationary BESS demand from rooftop solar.
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                    <h3 class="font-bold text-slate-900 text-sm flex items-center justify-between cursor-pointer" onclick="toggleFaq(this)">
+                        <span>10. What is the market missing regarding Exide's thesis?</span>
+                        <span class="text-slate-400 font-mono text-xs">+</span>
+                    </h3>
+                    <div class="faq-answer text-xs text-slate-600 mt-2 leading-relaxed pt-2 border-t border-slate-100">
+                        The <strong>Stationary Storage Blind Spot</strong>: Analysts treat EESL as a pure EV mobility play. Prismatic LFP cells require much shorter validation cycles for stationary BESS than auto homologation, unlocking earlier capacity utilization in FY28.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 text-xs text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Exide Industries Limited (EXIDEIND) Independent Research Intelligence SPA • Generated for Financial & Strategic Analysis</p>
+            <p class="mt-1 text-slate-500">Source: Q1 FY27 Disclosures, ICICI Direct, Motilal Oswal, Management Concall Transcripts & Primary Channel Data.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic & Chart Initialization -->
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all tab content sections
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            
+            // Remove active styling from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-amber-400', 'bg-slate-800', 'border-b-2', 'border-amber-400');
+                btn.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-850');
+            });
+
+            // Show selected section
+            const targetSec = document.getElementById('sec-' + tabId);
+            if (targetSec) targetSec.classList.remove('hidden');
+
+            // Style active button
+            const targetBtn = document.getElementById('tab-' + tabId);
+            if (targetBtn) {
+                targetBtn.classList.add('text-amber-400', 'bg-slate-800', 'border-b-2', 'border-amber-400');
+                targetBtn.classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-slate-850');
+            }
+        }
+
+        // Accordion FAQ Toggle
+        function toggleFaq(headerElem) {
+            const answerElem = headerElem.nextElementSibling;
+            const iconElem = headerElem.querySelector('span:last-child');
+            if (answerElem.classList.contains('hidden')) {
+                answerElem.classList.remove('hidden');
+                iconElem.innerText = '−';
+            } else {
+                answerElem.classList.add('hidden');
+                iconElem.innerText = '+';
+            }
+        }
+
+        // FAQ Filter Search
+        function filterFaqs() {
+            const query = document.getElementById('faqSearch').value.toLowerCase();
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        // Global Chart Instance Handles
+        let annualChartInstance = null;
+        let quarterlyChartInstance = null;
+        let competitorChartInstance = null;
+        let eeslChartInstance = null;
+
+        // Chart 1: Consolidated Annual Chart (FY22 - FY29E)
+        function initAnnualChart() {
+            const ctx = document.getElementById('annualOverviewChart').getContext('2d');
+            annualChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['FY22', 'FY23', 'FY24', 'FY25', 'FY26', 'FY27E', 'FY28E', 'FY29E'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'EBITDA Margin (%)',
+                            data: [10.96, 10.56, 10.87, 10.47, 10.42, 11.79, 12.49, 13.20],
+                            borderColor: '#f59e0b',
+                            backgroundColor: '#f59e0b',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            yAxisID: 'y1',
+                            tension: 0.2
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Revenue (₹ Cr)',
+                            data: [12789, 15078, 16770, 17238, 17995, 20778, 23700, 27250],
+                            backgroundColor: '#1e293b',
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'PAT (₹ Cr)',
+                            data: [4357, 823, 883, 800, 860, 1351, 1695, 2120],
+                            backgroundColor: '#059669',
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        label += '₹' + context.parsed.y.toLocaleString('en-IN') + ' Cr';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: '₹ Crore' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 8,
+                            max: 16,
+                            title: { display: true, text: 'Margin %' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Quarterly Chart Data State & Switcher Logic
+        const quarterlyDataStore = {
+            revenue: {
+                title: 'Quarterly Consolidated Revenue Trajectory (₹ Cr)',
+                label: 'Revenue (₹ Cr)',
+                color: '#1e293b',
+                data: [4695, 4365, 4201, 4735, 5528, 5050, 4800, 5400, 6200, 5800, 5500, 6200, 6900]
+            },
+            ebitda: {
+                title: 'Quarterly Consolidated EBITDA Trajectory (₹ Cr)',
+                label: 'EBITDA (₹ Cr)',
+                color: '#f59e0b',
+                data: [538, 391, 452, 488, 621, 606, 576, 648, 775, 725, 687, 775, 897]
+            },
+            pat: {
+                title: 'Quarterly Consolidated PAT Trajectory (₹ Cr)',
+                label: 'PAT (₹ Cr)',
+                color: '#059669',
+                data: [275, 174, 195, 217, 351, 330, 310, 360, 450, 410, 390, 445, 520]
+            },
+            growth: {
+                title: 'Quarterly Revenue & PAT YoY Growth Rates (%)',
+                label: 'Revenue YoY %',
+                color: '#2563eb',
+                data: [5.85, -0.16, 5.55, 9.22, 17.75, 15.69, 14.25, 14.04, 12.15, 14.85, 14.58, 14.81, 11.29]
+            }
+        };
+
+        const qLabels = ['Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26', 'Q1 FY27', 'Q2 FY27E', 'Q3 FY27E', 'Q4 FY27E', 'Q1 FY28E', 'Q2 FY28E', 'Q3 FY28E', 'Q4 FY28E', 'Q1 FY29E'];
+
+        function initQuarterlyChart() {
+            const ctx = document.getElementById('quarterlyForecastChart').getContext('2d');
+            quarterlyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: qLabels,
+                    datasets: [{
+                        label: quarterlyDataStore.revenue.label,
+                        data: quarterlyDataStore.revenue.data,
+                        backgroundColor: quarterlyDataStore.revenue.color,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + (document.getElementById('quarterlyChartTitle').innerText.includes('YoY') ? '%' : ' Cr');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: '#f1f5f9' } }
+                    }
+                }
+            });
+        }
+
+        function updateQuarterlyChart(metricKey) {
+            // Highlight button
+            document.querySelectorAll('.q-btn').forEach(b => {
+                b.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+                b.classList.add('text-slate-600');
+            });
+            const activeBtn = document.getElementById('btn-q-' + metricKey);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600');
+            }
+
+            const item = quarterlyDataStore[metricKey];
+            document.getElementById('quarterlyChartTitle').innerText = item.title;
+
+            quarterlyChartInstance.data.datasets[0].label = item.label;
+            quarterlyChartInstance.data.datasets[0].data = item.data;
+            quarterlyChartInstance.data.datasets[0].backgroundColor = item.color;
+            quarterlyChartInstance.update();
+        }
+
+        // Chart 3: Competitor Standalone EBITDA Margin Comparison Chart
+        function initCompetitorChart() {
+            const ctx = document.getElementById('competitorMarginChart').getContext('2d');
+            competitorChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26', 'Q1 FY27'],
+                    datasets: [
+                        {
+                            label: 'Exide Standalone EBITDA Margin (%)',
+                            data: [11.45, 8.95, 10.75, 10.30, 12.40],
+                            borderColor: '#059669',
+                            backgroundColor: '#059669',
+                            borderWidth: 3,
+                            pointRadius: 5
+                        },
+                        {
+                            label: 'Amara Raja EBITDA Margin (%)',
+                            data: [10.66, 9.80, 10.10, 10.20, 9.60],
+                            borderColor: '#dc2626',
+                            backgroundColor: '#dc2626',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ctx.dataset.label + ': ' + ctx.parsed.y + '%'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            min: 7,
+                            max: 14,
+                            title: { display: true, text: 'Margin %' },
+                            grid: { color: '#f1f5f9' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chart 4: EESL Ramp & Depreciation Chart
+        function initEeslChart() {
+            const ctx = document.getElementById('eeslRampChart').getContext('2d');
+            eeslChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q2 FY27E', 'Q3 FY27E', 'Q4 FY27E', 'Q1 FY28E', 'Q2 FY28E', 'Q3 FY28E', 'Q4 FY28E'],
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Target Phase 1 Capacity Utilization (%)',
+                            data: [0, 5, 15, 20, 25, 28, 30],
+                            borderColor: '#f59e0b',
+                            backgroundColor: '#f59e0b',
+                            borderWidth: 3,
+                            yAxisID: 'y1'
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Depreciation Expense (₹ Cr)',
+                            data: [145, 165, 185, 195, 200, 205, 210],
+                            backgroundColor: '#64748b',
+                            borderRadius: 4,
+                            yAxisID: 'y'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: {
+                            title: { display: true, text: 'Depreciation (₹ Cr)' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            max: 50,
+                            title: { display: true, text: 'Utilization %' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Interactive Scenario Simulator Engine Logic
+        function runScenarioSimulation() {
+            const eeslVal = parseInt(document.getElementById('sliderEesl').value);
+            const leadVal = parseFloat(document.getElementById('sliderLead').value);
+            const bessVal = parseInt(document.getElementById('sliderBess').value);
+
+            // Update Label Displays
+            document.getElementById('valEesl').innerText = eeslVal + '% ' + (eeslVal === 25 ? '(Base Case)' : '');
+            document.getElementById('valLead').innerText = (leadVal > 0 ? '+' : '') + leadVal + '% ' + (leadVal < 0 ? '(Softening Tailwind)' : (leadVal > 0 ? '(Cost Drag)' : '(Neutral)'));
+            document.getElementById('valBess').innerText = '+' + bessVal + '% Growth';
+
+            // Baseline Base Case Numbers for FY28E:
+            // Rev = ₹23,700 Cr, Base EBITDA = ₹2,962 Cr (12.49%), Base PAT = ₹1,695 Cr
+            let baseRev = 23700;
+            let baseEbitda = 2962;
+
+            // Shift Revenue based on BESS and EESL scaling
+            let revShift = ((bessVal - 15) * 40) + ((eeslVal - 25) * 50);
+            let simRevVal = baseRev + revShift;
+
+            // Shift EBITDA based on Lead price offset and EESL leverage
+            // Lead drop increases margin: -5% lead gives +0.4% margin expansion
+            let leadMarginImpact = (-leadVal / 5) * 0.004; 
+            let eeslLeverageImpact = ((eeslVal - 25) / 5) * 35; // ₹35 Cr EBITDA per 5% utilization shift
+
+            let simEbitdaVal = Math.round((simRevVal * (0.1249 + leadMarginImpact)) + eeslLeverageImpact);
+            let simMarginVal = ((simEbitdaVal / simRevVal) * 100).toFixed(2);
+
+            // Calculate PAT flow-through (Fixed D&A ~₹810 Cr, Tax ~23%)
+            let simEbitVal = simEbitdaVal - 810;
+            let simPbtVal = simEbitVal - 80 + 150; // Finance cost -80 + Other income +150
+            let simPatVal = Math.round(simPbtVal * (1 - 0.232));
+            let simEpsVal = (simPatVal / 85).toFixed(2); // ~85 Cr shares outstanding
+
+            // DOM Updates
+            document.getElementById('simRev').innerText = '₹' + simRevVal.toLocaleString('en-IN') + ' Cr';
+            document.getElementById('simEbitda').innerText = '₹' + simEbitdaVal.toLocaleString('en-IN') + ' Cr';
+            document.getElementById('simEbitdaMargin').innerText = '(Margin: ' + simMarginVal + '%)';
+            document.getElementById('simPat').innerText = '₹' + simPatVal.toLocaleString('en-IN') + ' Cr';
+            document.getElementById('simEps').innerText = 'Implied EPS: ₹' + simEpsVal + ' / share';
+        }
+
+        // Initialize All Charts on DOM Content Loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            initAnnualChart();
+            initQuarterlyChart();
+            initCompetitorChart();
+            initEeslChart();
+        });
+    </script>
+
+</body>
+</html>
