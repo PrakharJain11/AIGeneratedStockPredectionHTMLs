@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Forgings Ltd (HAPPYFORGE) - Institutional Equity Research Intelligence</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#2563eb',
+                            600: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#0f172a',
+                        },
+                        emeraldCustom: '#059669',
+                        roseCustom: '#e11d48',
+                        amberCustom: '#d97706'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Chart Container Rules as per styling specifications */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 680px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        /* Custom scrollbar for data tables */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- Mandatory Placeholder Comments -->
+    <!-- Chosen Palette: Warm Institutional Neutral (Background: Slate-50, Primary: Slate-900, Accent: Blue-600, Positive: Emerald-600, Negative: Rose-600, Warning: Amber-600) -->
+    <!-- Application Structure Plan: Designed as a 5-tab Interactive Institutional Analyst Portal. 1. Executive Summary & Dashboard (Key financial KPIs, market overview, ticker context). 2. Financial Trajectory & Estimates (Interactive multi-metric chart FY24-FY29E, Q1 FY27 beat analysis). 3. Valuation & Target Price Spectrum (Divergence analysis between Motilal Oswal ₹2,438 Buy and Ambit ₹817 Sell, interactive target P/E price simulator, Peer ROCE comparison). 4. Strategic Thesis: Bull vs. Bear Drivers (Capex, 18,000T press line, captive solar vs. Red Sea crisis, working capital friction). 5. Brokerage Coverage Database & Source Register (Filterable table of global/domestic coverage, report inventory, verification levels). Structure was chosen to move from high-level synthesis to granular financial modeling, facilitating deep institutional stock research. -->
+    <!-- Visualization & Content Choices: 
+        1. Executive Metrics -> Visual Cards & Status Indicators -> Fast snapshot of stock metrics -> Raw HTML/Tailwind.
+        2. Financial Trajectory (FY24-FY29E) -> Interactive Multi-Dataset Line/Bar Chart -> Chart.js Canvas -> Allows metric switching (Revenue, EBITDA, PAT) -> Clear visibility into 25% CAGR thesis.
+        3. Target Price Spectrum -> Horizontal Bar Chart -> Chart.js Canvas -> Visualizes the dramatic divergence between bull (Motilal ₹2,438) and bear (Ambit ₹817) targets.
+        4. Peer Efficiency vs Valuation -> Grouped Bar Chart -> Chart.js Canvas -> Demonstrates why HF trades at 60x P/E due to double ROCE (18.2%) vs peers.
+        5. Segment Mix Transition -> Donut Chart -> Chart.js Canvas -> Shows the shift from CV dependence (80%+) to Industrial/PV (50%).
+        6. Valuation Price Target Simulator -> Interactive Slider & Input -> JS Event Handlers -> Real-time P/E and EPS sensitivity calculation.
+        7. Brokerage Database -> Interactive Filterable Table -> JS Filtering -> Instant search by brokerage name, rating, status.
+        8. NO SVG graphics used. NO Mermaid JS used. All visuals rely on Canvas or Tailwind structured HTML layout.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- TOP HEADER / TICKER BAR -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <span class="bg-blue-600 text-white font-bold text-xs px-2.5 py-1 rounded tracking-wider uppercase">NSE: HAPPYFORGE</span>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight leading-none text-white">Happy Forgings Ltd</h1>
+                        <p class="text-xs text-slate-400 mt-0.5">Institutional Equity Research Portal (FY26–FY27 Analysis)</p>
+                    </div>
+                </div>
+
+                <!-- Snapshot Metrics Ticker -->
+                <div class="hidden md:flex items-center space-x-6 text-xs">
+                    <div class="border-l border-slate-800 pl-4">
+                        <span class="text-slate-400 block">Market Cap</span>
+                        <span class="font-semibold text-slate-200">₹20,280 Cr</span>
+                    </div>
+                    <div class="border-l border-slate-800 pl-4">
+                        <span class="text-slate-400 block">Trailing P/E</span>
+                        <span class="font-semibold text-amber-400">60.8x - 63.8x</span>
+                    </div>
+                    <div class="border-l border-slate-800 pl-4">
+                        <span class="text-slate-400 block">ROCE / ROE</span>
+                        <span class="font-semibold text-emerald-400">18.2% / 15.2%</span>
+                    </div>
+                    <div class="border-l border-slate-800 pl-4">
+                        <span class="text-slate-400 block">Target Range</span>
+                        <span class="font-semibold text-blue-400">₹817 - ₹2,438</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN NAVIGATION TABS -->
+        <nav class="bg-slate-800 border-t border-slate-700/60 text-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 sm:space-x-4 overflow-x-auto custom-scrollbar">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-btn px-4 py-3 font-medium text-white border-b-2 border-blue-500 whitespace-nowrap">
+                    Executive Dashboard
+                </button>
+                <button onclick="switchTab('financials')" id="tab-financials" class="nav-btn px-4 py-3 font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent whitespace-nowrap">
+                    Financial Trajectory & Forecasts
+                </button>
+                <button onclick="switchTab('valuation')" id="tab-valuation" class="nav-btn px-4 py-3 font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent whitespace-nowrap">
+                    Valuation & Target Spectrum
+                </button>
+                <button onclick="switchTab('thesis')" id="tab-thesis" class="nav-btn px-4 py-3 font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent whitespace-nowrap">
+                    Bull vs Bear Deep Dive
+                </button>
+                <button onclick="switchTab('brokerages')" id="tab-brokerages" class="nav-btn px-4 py-3 font-medium text-slate-400 hover:text-slate-200 border-b-2 border-transparent whitespace-nowrap">
+                    Brokerage Database & Sources
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: EXECUTIVE DASHBOARD                 -->
+        <!-- ========================================== -->
+        <section id="sec-dashboard" class="tab-content space-y-6">
+            
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Institutional Research Synthesis & Executive Summary</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Happy Forgings Ltd (HAPPYFORGE) is undergoing a structural transition from a commercial vehicle (CV) dependent forging supplier into a high-precision, heavy-engineering component manufacturer. Operating in the upper echelons of the Indian small-to-mid-cap segment, institutional consensus centers on its aggressive ₹650–800 Crore capex cycle (featuring 14,000T, 10,000T, and upcoming 18,000T presses) and a robust ₹9.5 Billion executable order book. This interactive portal synthesizes coverage from domestic institutional research desks (Motilal Oswal, MNCL Group, Ambit Capital, ICICI Securities) to analyze historical FY26 reported actuals, Q1 FY27 earnings beats, and forward projections through FY29.
+                </p>
+            </div>
+
+            <!-- KPI Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300 transition">
+                    <div class="text-xs font-semibold uppercase text-slate-500">FY26 Revenue (Actual)</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1">₹1,546.3 Cr</div>
+                    <div class="text-xs font-medium text-emerald-600 mt-1 flex items-center">
+                        <span class="mr-1">▲</span> +9.8% YoY | Q4 Volume +20.6%
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300 transition">
+                    <div class="text-xs font-semibold uppercase text-slate-500">Q1 FY27 EBITDA Margin</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1">31.3%</div>
+                    <div class="text-xs font-medium text-emerald-600 mt-1 flex items-center">
+                        <span class="mr-1">▲</span> 4th Consecutive Quarter >30%
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300 transition">
+                    <div class="text-xs font-semibold uppercase text-slate-500">Executable Order Book</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1">₹950 Cr</div>
+                    <div class="text-xs font-medium text-blue-600 mt-1">
+                        ● ₹250 Cr in Heavy Forgings line
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm hover:border-slate-300 transition">
+                    <div class="text-xs font-semibold uppercase text-slate-500">Brokerage Consensus Target</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1">₹1,870 - ₹2,438</div>
+                    <div class="text-xs font-medium text-amber-600 mt-1">
+                        ■ Ambit Bear Case: ₹817 (Sell)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Revenue & Margin Trend -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Revenue & Profitability Growth (FY24 - FY29E)</h3>
+                            <p class="text-xs text-slate-500">Motilal Oswal & Consensus Estimates (₹ Crore)</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-dashboard-growth"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Product Mix Transition -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Revenue Mix Transformation</h3>
+                            <p class="text-xs text-slate-500">De-risking from Commercial Vehicles to Industrial/PV</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-dashboard-mix"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational & Strategic Summary Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-900 text-white p-5 rounded-lg shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-400 block mb-1">Moat Factor #1</span>
+                    <h4 class="text-base font-bold mb-2">18,000-Tonne Heavy Press</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Commissioning in Q4 FY27 to forge colossal components up to 3,000 kg. Eliminates domestic competition in nuclear, defense, mining, and high-spec industrial markets.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 text-white p-5 rounded-lg shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block mb-1">Moat Factor #2</span>
+                    <h4 class="text-base font-bold mb-2">90% Machining Value Addition</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Matching raw forging capacity (148,000 MT) with machining (68,000 MT). Realization per kg expanded to ₹253 in Q1 FY27, generating superior 31%+ margins.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 text-white p-5 rounded-lg shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block mb-1">Moat Factor #3</span>
+                    <h4 class="text-base font-bold mb-2">35 MW Captive Solar Plant</h4>
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Operationalization targeted for January 2027 on an 80-acre plot. Modeled to add 100-150 bps directly to EBITDA margin while fulfilling global OEM ESG mandates.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: FINANCIAL TRAJECTORY & FORECASTS    -->
+        <!-- ========================================== -->
+        <section id="sec-financials" class="tab-content hidden space-y-6">
+            
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Financial Performance, Estimates & Earnings Analysis</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Happy Forgings reported its highest-ever annual profitability in FY26, with PAT reaching ₹301.6 Crore. Momentum accelerated into Q1 FY27, beating market consensus across revenue (+27% YoY to ₹449.4 Cr) and net profit (+39.2% YoY to ₹91.5 Cr). Institutional models from Motilal Oswal and MNCL Group project a 22-25% Revenue CAGR through FY29, driven by order book execution and realization gains. Explore the financial matrix and interactive metric switcher below.
+                </p>
+            </div>
+
+            <!-- Interactive Metric Explorer Bar -->
+            <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                <div class="text-sm font-semibold text-slate-800">
+                    Select Financial Metric View:
+                </div>
+                <div class="flex flex-wrap space-x-2">
+                    <button onclick="updateFinancialChart('revenue')" id="btn-chart-revenue" class="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white shadow-sm">
+                        Revenue & EBITDA (₹ Cr)
+                    </button>
+                    <button onclick="updateFinancialChart('profitability')" id="btn-chart-profitability" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        Net Profit (PAT) & EPS (₹)
+                    </button>
+                    <button onclick="updateFinancialChart('margins')" id="btn-chart-margins" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200">
+                        EBITDA Margin (%) Trend
+                    </button>
+                </div>
+            </div>
+
+            <!-- Financial Chart Container -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <div class="chart-container" style="max-width: 850px; height: 380px;">
+                    <canvas id="chart-financial-main"></canvas>
+                </div>
+            </div>
+
+            <!-- Granular Financial Statement Comparison Table -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+                    <h3 class="text-base font-bold text-slate-900">Financial Statements & Projections Matrix (FY24 - FY29E)</h3>
+                    <span class="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded">Values in ₹ Crore unless specified</span>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Financial Metric</th>
+                                <th class="p-3">FY24 (Actual)</th>
+                                <th class="p-3">FY25 (Actual)</th>
+                                <th class="p-3">FY26 (Actual)</th>
+                                <th class="p-3 text-blue-700">Q1 FY27 (Act)</th>
+                                <th class="p-3 text-blue-700">FY27E (Motilal)</th>
+                                <th class="p-3 text-blue-700">FY28E (Consensus)</th>
+                                <th class="p-3 text-blue-700">FY29E (Motilal)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-mono">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Revenue from Operations</td>
+                                <td class="p-3">1,358.2</td>
+                                <td class="p-3">1,408.9</td>
+                                <td class="p-3 font-bold">1,546.3</td>
+                                <td class="p-3 text-blue-700 font-bold">449.4</td>
+                                <td class="p-3">1,982.6</td>
+                                <td class="p-3">2,245.0</td>
+                                <td class="p-3 font-bold">3,000.2</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">EBITDA</td>
+                                <td class="p-3">387.5</td>
+                                <td class="p-3">406.7</td>
+                                <td class="p-3 font-bold">470.7</td>
+                                <td class="p-3 text-blue-700 font-bold">141.0</td>
+                                <td class="p-3">628.4</td>
+                                <td class="p-3">705.0</td>
+                                <td class="p-3 font-bold">985.0</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 bg-blue-50/30">
+                                <td class="p-3 font-semibold font-sans text-slate-900">EBITDA Margin (%)</td>
+                                <td class="p-3">28.5%</td>
+                                <td class="p-3">28.9%</td>
+                                <td class="p-3 font-bold text-emerald-700">30.4%</td>
+                                <td class="p-3 text-blue-700 font-bold">31.3%</td>
+                                <td class="p-3">31.7%</td>
+                                <td class="p-3">31.7%</td>
+                                <td class="p-3 font-bold text-emerald-700">32.8%</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Profit After Tax (PAT)</td>
+                                <td class="p-3">243.0</td>
+                                <td class="p-3">267.6</td>
+                                <td class="p-3 font-bold">301.6</td>
+                                <td class="p-3 text-blue-700 font-bold">91.5</td>
+                                <td class="p-3">402.4</td>
+                                <td class="p-3">485.0</td>
+                                <td class="p-3 font-bold">664.6</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Diluted EPS (₹)</td>
+                                <td class="p-3">₹25.80</td>
+                                <td class="p-3">₹28.40</td>
+                                <td class="p-3 font-bold">₹31.97</td>
+                                <td class="p-3 text-blue-700 font-bold">₹9.70</td>
+                                <td class="p-3">₹42.60</td>
+                                <td class="p-3">₹51.50</td>
+                                <td class="p-3 font-bold">₹70.50</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Realization per Kg (₹)</td>
+                                <td class="p-3">₹238</td>
+                                <td class="p-3">₹242</td>
+                                <td class="p-3">₹245</td>
+                                <td class="p-3 text-blue-700 font-bold">₹253</td>
+                                <td class="p-3">₹260</td>
+                                <td class="p-3">₹272</td>
+                                <td class="p-3 font-bold">₹290</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Q1 FY27 Result Beat Analysis Callout -->
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                <h4 class="text-sm font-bold text-blue-900 uppercase tracking-wide">Q1 FY27 Beat Breakdown</h4>
+                <p class="text-xs text-blue-800 mt-1 leading-relaxed">
+                    Q1 FY27 standalone revenue surpassed institutional estimates by 2.2%, while Net Profit beat consensus by 10.0%. Margins expanded due to higher machining content (90%) and a recovery in heavy commercial vehicle forgings. Realization per kg jumped 3.2% YoY to ₹253, reflecting the ongoing mix shift toward heavy industrial components.
+                </p>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: VALUATION & TARGET SPECTRUM        -->
+        <!-- ========================================== -->
+        <section id="sec-valuation" class="tab-content hidden space-y-6">
+            
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Brokerage Valuation Divergence & Peer Benchmarking</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Valuation opinions on Happy Forgings exhibit sharp institutional polarization. Growth-oriented brokerages like Motilal Oswal assign a premium 38x forward P/E multiple (Target: ₹2,438), viewing the stock as a specialized precision-engineering proxy. Conversely, Ambit Capital rates the stock a SELL (Target: ₹817) using a DCF methodology, highlighting depressed Free Cash Flow conversion due to ongoing capex. Meanwhile, Happy Forgings trades at superior capital efficiency (18.2% ROCE) relative to large peers Bharat Forge and Ramkrishna Forgings.
+                </p>
+            </div>
+
+            <!-- Valuation Visuals Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Target Price Spectrum Chart -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Target Price Divergence (₹)</h3>
+                    <p class="text-xs text-slate-500 mb-4">Comparing Institutional Brokerage Targets vs Current Price (~₹1,320)</p>
+                    <div class="chart-container">
+                        <canvas id="chart-valuation-targets"></canvas>
+                    </div>
+                </div>
+
+                <!-- Peer Group ROCE vs PE Chart -->
+                <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Peer Group Efficiency: ROCE (%) vs Trailing P/E</h3>
+                    <p class="text-xs text-slate-500 mb-4">Benchmarking capital returns against current valuation multiples</p>
+                    <div class="chart-container">
+                        <canvas id="chart-valuation-peers"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Price Target Simulator / Calculator -->
+            <div class="bg-slate-900 text-white p-6 rounded-lg shadow-md border border-slate-800">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Interactive Target Price Sensitivity Simulator</h3>
+                        <p class="text-xs text-slate-400">Model implied target price based on FY28E EPS and exit P/E multiples</p>
+                    </div>
+                    <span class="bg-blue-600/30 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-500/30 font-mono">
+                        Proprietary Model Tool
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <div>
+                        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
+                            Assumed FY28 EPS (₹):
+                        </label>
+                        <input type="number" id="calc-eps" value="51.5" step="0.5" oninput="calculateSensitivity()" class="w-full bg-slate-800 text-white font-mono text-sm px-3 py-2 rounded border border-slate-700 focus:outline-none focus:border-blue-500">
+                        <span class="text-[10px] text-slate-500 mt-1 block">Consensus FY28E EPS is ~₹51.50</span>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 block mb-2">
+                            Target Forward P/E Multiple: <span id="calc-pe-val" class="text-blue-400 font-bold">35.0x</span>
+                        </label>
+                        <input type="range" id="calc-pe" min="15" max="50" value="35" step="1" oninput="calculateSensitivity()" class="w-full accent-blue-500 cursor-pointer">
+                        <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                            <span>15x (Bear)</span>
+                            <span>35x (Consensus)</span>
+                            <span>50x (Bull)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 text-center">
+                        <span class="text-xs font-semibold uppercase text-slate-400 block">Implied Fair Stock Price</span>
+                        <div id="calc-result-price" class="text-3xl font-extrabold text-emerald-400 mt-1">₹1,802.50</div>
+                        <span id="calc-result-upside" class="text-xs font-medium text-slate-300 mt-1 block">+36.5% Upside from ₹1,320</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peer Valuation Table -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-slate-50">
+                    <h3 class="text-base font-bold text-slate-900">Peer Group Valuation & Financial Return Comparison</h3>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Company Name</th>
+                                <th class="p-3">Market Cap (₹ Cr)</th>
+                                <th class="p-3">Trailing P/E (x)</th>
+                                <th class="p-3">EV / EBITDA (x)</th>
+                                <th class="p-3 text-emerald-700">ROCE (%)</th>
+                                <th class="p-3">ROE (%)</th>
+                                <th class="p-3">Key Differentiator</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-mono">
+                            <tr class="bg-blue-50/40 hover:bg-blue-50">
+                                <td class="p-3 font-bold font-sans text-slate-900">Happy Forgings Ltd</td>
+                                <td class="p-3">~20,280</td>
+                                <td class="p-3 font-bold text-amber-700">60.8x</td>
+                                <td class="p-3">37.2x</td>
+                                <td class="p-3 font-bold text-emerald-700">18.2%</td>
+                                <td class="p-3 font-bold">15.2%</td>
+                                <td class="p-3 font-sans text-slate-600">90% machining, 30%+ EBITDA margin</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Bharat Forge Ltd</td>
+                                <td class="p-3">~94,130</td>
+                                <td class="p-3 text-rose-700">117.4x</td>
+                                <td class="p-3">39.5x</td>
+                                <td class="p-3">9.8%</td>
+                                <td class="p-3">7.5%</td>
+                                <td class="p-3 font-sans text-slate-600">Industry giant, high defense exposure</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Ramkrishna Forgings</td>
+                                <td class="p-3">~13,052</td>
+                                <td class="p-3 text-rose-700">111.4x</td>
+                                <td class="p-3">23.8x</td>
+                                <td class="p-3">6.1%</td>
+                                <td class="p-3">2.8%</td>
+                                <td class="p-3 font-sans text-slate-600">Aggressive M&A, higher leverage</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">Balu Forge Industries</td>
+                                <td class="p-3">~6,295</td>
+                                <td class="p-3">32.5x</td>
+                                <td class="p-3">24.5x</td>
+                                <td class="p-3 text-emerald-700 font-bold">17.4%</td>
+                                <td class="p-3">13.7%</td>
+                                <td class="p-3 font-sans text-slate-600">Rapid growth in small forgings</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold font-sans text-slate-900">MM Forgings Ltd</td>
+                                <td class="p-3">~2,958</td>
+                                <td class="p-3 text-emerald-700 font-bold">20.5x</td>
+                                <td class="p-3">12.7x</td>
+                                <td class="p-3">9.5%</td>
+                                <td class="p-3">11.5%</td>
+                                <td class="p-3 font-sans text-slate-600">Value pick, lower machining share</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: BULL VS BEAR DEEP DIVE             -->
+        <!-- ========================================== -->
+        <section id="sec-thesis" class="tab-content hidden space-y-6">
+            
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Core Strategic Thesis: Catalysts vs Risk Factors</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    Evaluating Happy Forgings requires balancing exceptional operational moat expansion against real-world supply chain and valuation risks. The institutional bull thesis is anchored in heavy press commissioning (18,000T), expanding export wallet share, and captive solar cost reduction. Conversely, the bear case highlights geopolitical logistics costs (Red Sea crisis), working capital stretch (100+ debtor days), and the complete lack of valuation margin of safety at 60x trailing P/E. Explore the core drivers below.
+                </p>
+            </div>
+
+            <!-- Split Bull / Bear Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- BULL CASE COLUMN -->
+                <div class="bg-emerald-50/50 border border-emerald-200 rounded-lg p-5 space-y-4">
+                    <div class="flex items-center space-x-2 border-b border-emerald-200 pb-3">
+                        <span class="w-3 h-3 rounded-full bg-emerald-600"></span>
+                        <h3 class="text-lg font-bold text-emerald-950">Institutional Bull Case (Catalysts)</h3>
+                    </div>
+
+                    <!-- Driver Card 1 -->
+                    <div class="bg-white p-4 rounded border border-emerald-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-emerald-900 flex justify-between">
+                            1. Ultra-Heavy Forging Line Monopoly
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Capex Moat</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            The ₹650–800 Cr capex includes 14,000T, 10,000T, and the upcoming 18,000T vertical press (Q4 FY27). Capable of forging components up to 3,000 kg, this asset shuts out domestic competition for heavy industrial, wind, defense, and power gen crankshafts.
+                        </p>
+                    </div>
+
+                    <!-- Driver Card 2 -->
+                    <div class="bg-white p-4 rounded border border-emerald-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-emerald-900 flex justify-between">
+                            2. Machining Wallet Share & Realization
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">30%+ EBITDA</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Machining content reached 90% in Q1 FY27. Machined components command 2x-3x higher realization per kg than raw forgings, insulating Happy Forgings from steel raw material price volatility.
+                        </p>
+                    </div>
+
+                    <!-- Driver Card 3 -->
+                    <div class="bg-white p-4 rounded border border-emerald-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-emerald-900 flex justify-between">
+                            3. Captive Solar Project Margin Expansion
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">+150 bps Margin</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            35 MW captive solar plant scheduled for Jan 2027 on an 80-acre plot will lower grid electricity dependency. Modeled to add 100-150 bps to EBITDA margin while satisfying North American OEM ESG standards.
+                        </p>
+                    </div>
+
+                    <!-- Driver Card 4 -->
+                    <div class="bg-white p-4 rounded border border-emerald-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-emerald-900 flex justify-between">
+                            4. De-risking Away from CV Segment
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Diversification</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Passenger vehicle (PV) and industrial segments are expanding to 45–50% of revenue. PV business alone is projected at a 53% CAGR over FY25-FY28E, supported by dedicated export lines.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- BEAR CASE COLUMN -->
+                <div class="bg-rose-50/50 border border-rose-200 rounded-lg p-5 space-y-4">
+                    <div class="flex items-center space-x-2 border-b border-rose-200 pb-3">
+                        <span class="w-3 h-3 rounded-full bg-rose-600"></span>
+                        <h3 class="text-lg font-bold text-rose-950">Institutional Bear Case (Risks)</h3>
+                    </div>
+
+                    <!-- Risk Card 1 -->
+                    <div class="bg-white p-4 rounded border border-rose-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-rose-900 flex justify-between">
+                            1. Red Sea Shipping Logistics Disruption
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Export Delay</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Exports represent 12–18% of revenues. Rerouting shipping around the Cape of Good Hope has increased transit times, inflated container freight rates, and delayed revenue recognition for European/US consignments.
+                        </p>
+                    </div>
+
+                    <!-- Risk Card 2 -->
+                    <div class="bg-white p-4 rounded border border-rose-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-rose-900 flex justify-between">
+                            2. Working Capital Expansion & FCF Stress
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Ambit SELL Thesis</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Debtor days expanded to 82–101 days and inventory days stretched to ~88 days. Heavy capex combined with working capital tie-ups depresses Free Cash Flow conversion (FCFF/PAT), leaving minimal free cash.
+                        </p>
+                    </div>
+
+                    <!-- Risk Card 3 -->
+                    <div class="bg-white p-4 rounded border border-rose-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-rose-900 flex justify-between">
+                            3. Extreme Valuation Froth (60x P/E)
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Execution Risk</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Trading at 60x trailing earnings, the stock assumes zero execution flaws. Any delay in the 18,000T press line operationalization or industrial order ramp-up could trigger severe P/E multiple contraction.
+                        </p>
+                    </div>
+
+                    <!-- Risk Card 4 -->
+                    <div class="bg-white p-4 rounded border border-rose-200 shadow-sm">
+                        <h4 class="text-sm font-bold text-rose-900 flex justify-between">
+                            4. Legacy CV & Agri Cyclicality
+                            <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Macro Risk</span>
+                        </h4>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+                            Commercial Vehicles (38%) and Farm Equipment (32%) still comprise ~70% of current revenues. Domestic tractor slowdowns or global CV down-cycles could offset incremental industrial gains.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 5: BROKERAGE DATABASE & SOURCES        -->
+        <!-- ========================================== -->
+        <section id="sec-brokerages" class="tab-content hidden space-y-6">
+            
+            <!-- Section Intro Paragraph -->
+            <div class="bg-white p-5 rounded-lg border border-slate-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Institutional Research Database & Source Register</h2>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                    This database catalogs institutional coverage across domestic Indian brokerages, global investment banks, and credit rating agencies. Coverage is heavily concentrated among Indian tier-1 research desks due to promoter holding (78.46%) and free-float liquidity constraints that limit bulge-bracket global initiations. All financial estimates and target prices are classified according to source verification tiers. Filter and search the database below.
+                </p>
+            </div>
+
+            <!-- Database Search & Filter Control Bar -->
+            <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="relative flex-1">
+                    <input type="text" id="db-search" oninput="filterBrokerageTable()" placeholder="Search brokerage name, recommendation, analyst, or report type..." class="w-full bg-slate-50 text-slate-800 text-sm px-4 py-2 pl-9 rounded border border-slate-300 focus:outline-none focus:border-blue-500">
+                    <span class="absolute left-3 top-2.5 text-slate-400 text-xs">🔍</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <div>
+                        <label class="text-slate-500 mr-1 font-semibold">Category:</label>
+                        <select id="filter-cat" onchange="filterBrokerageTable()" class="bg-slate-50 border border-slate-300 rounded px-2 py-1.5 focus:outline-none">
+                            <option value="ALL">All Categories</option>
+                            <option value="Indian Institutional">Indian Institutional</option>
+                            <option value="Global Institutional">Global Institutional</option>
+                            <option value="Credit Rating Agency">Credit Rating Agency</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-slate-500 mr-1 font-semibold">Recommendation:</label>
+                        <select id="filter-rec" onchange="filterBrokerageTable()" class="bg-slate-50 border border-slate-300 rounded px-2 py-1.5 focus:outline-none">
+                            <option value="ALL">All Ratings</option>
+                            <option value="BUY">BUY</option>
+                            <option value="HOLD">HOLD</option>
+                            <option value="SELL">SELL</option>
+                            <option value="Rating Reaffirmed">Rating Reaffirmed</option>
+                            <option value="Unverified">Unverified</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brokerage Database Table -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table id="brokerage-table" class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 text-slate-700 uppercase font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="p-3">Brokerage Firm</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Report Date</th>
+                                <th class="p-3">Report Type</th>
+                                <th class="p-3">Recommendation</th>
+                                <th class="p-3">Target Price (₹)</th>
+                                <th class="p-3">Analyst Name</th>
+                                <th class="p-3">Source Verification</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 font-sans">
+                            <!-- Motilal Oswal -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Indian Institutional" data-rec="BUY">
+                                <td class="p-3 font-bold text-slate-900">Motilal Oswal Financial Services</td>
+                                <td class="p-3"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Indian Institutional</span></td>
+                                <td class="p-3 font-mono">Sep 15, 2026</td>
+                                <td class="p-3">Company Update / Estimates</td>
+                                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">BUY</span></td>
+                                <td class="p-3 font-mono font-bold text-slate-900">₹2,438</td>
+                                <td class="p-3">Aniket Mhatre, Jeemit Shah</td>
+                                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Tier 1 - Primary</span></td>
+                            </tr>
+
+                            <!-- MNCL Group -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Indian Institutional" data-rec="HOLD">
+                                <td class="p-3 font-bold text-slate-900">MNCL Group (Monarch Networth)</td>
+                                <td class="p-3"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Indian Institutional</span></td>
+                                <td class="p-3 font-mono">Aug 12, 2026</td>
+                                <td class="p-3">Q1 FY27 Result Review</td>
+                                <td class="p-3"><span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded">HOLD</span></td>
+                                <td class="p-3 font-mono font-bold text-slate-900">₹1,875</td>
+                                <td class="p-3">Sahil Sanghvi, Uvais Khatri</td>
+                                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Tier 1 - Primary</span></td>
+                            </tr>
+
+                            <!-- Ambit Capital -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Indian Institutional" data-rec="SELL">
+                                <td class="p-3 font-bold text-slate-900">Ambit Capital</td>
+                                <td class="p-3"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Indian Institutional</span></td>
+                                <td class="p-3 font-mono">Aug 19, 2026</td>
+                                <td class="p-3">Auto Ancillary Sector Research</td>
+                                <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded">SELL</span></td>
+                                <td class="p-3 font-mono font-bold text-slate-900">₹817</td>
+                                <td class="p-3">Viraj Sanghvi, Ashwin Mehta</td>
+                                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Tier 1 - Primary</span></td>
+                            </tr>
+
+                            <!-- ICICI Securities -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Indian Institutional" data-rec="BUY">
+                                <td class="p-3 font-bold text-slate-900">ICICI Securities</td>
+                                <td class="p-3"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Indian Institutional</span></td>
+                                <td class="p-3 font-mono">Aug 06, 2026</td>
+                                <td class="p-3">Q1 FY27 Result Review</td>
+                                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">BUY</span></td>
+                                <td class="p-3 font-mono font-bold text-slate-900">₹1,300</td>
+                                <td class="p-3">Unverified</td>
+                                <td class="p-3"><span class="bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded">Tier 2 - Secondary</span></td>
+                            </tr>
+
+                            <!-- CRISIL Ratings -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Credit Rating Agency" data-rec="Rating Reaffirmed">
+                                <td class="p-3 font-bold text-slate-900">CRISIL Ratings</td>
+                                <td class="p-3"><span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded">Credit Rating Agency</span></td>
+                                <td class="p-3 font-mono">Jul 2026</td>
+                                <td class="p-3">Bank Debt Rating Rationale</td>
+                                <td class="p-3"><span class="bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">CRISIL AA/Stable</span></td>
+                                <td class="p-3 font-mono text-slate-400">N/A</td>
+                                <td class="p-3">Rating Committee</td>
+                                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Tier 1 - Primary</span></td>
+                            </tr>
+
+                            <!-- ICRA Limited -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Credit Rating Agency" data-rec="Rating Reaffirmed">
+                                <td class="p-3 font-bold text-slate-900">ICRA Limited</td>
+                                <td class="p-3"><span class="bg-purple-50 text-purple-700 px-2 py-0.5 rounded">Credit Rating Agency</span></td>
+                                <td class="p-3 font-mono">Jun 2026</td>
+                                <td class="p-3">Credit Rating Rationale</td>
+                                <td class="p-3"><span class="bg-slate-200 text-slate-800 font-bold px-2 py-0.5 rounded">[ICRA]AA (Stable)</span></td>
+                                <td class="p-3 font-mono text-slate-400">N/A</td>
+                                <td class="p-3">Rating Committee</td>
+                                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-semibold">Tier 1 - Primary</span></td>
+                            </tr>
+
+                            <!-- Morgan Stanley -->
+                            <tr class="hover:bg-slate-50 db-row" data-cat="Global Institutional" data-rec="Unverified">
+                                <td class="p-3 font-bold text-slate-900">Morgan Stanley / Goldman Sachs / J.P. Morgan</td>
+                                <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">Global Institutional</span></td>
+                                <td class="p-3 font-mono">N/A</td>
+                                <td class="p-3">No Active Public Coverage</td>
+                                <td class="p-3"><span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded">Unverified</span></td>
+                                <td class="p-3 font-mono text-slate-400">Not Found</td>
+                                <td class="p-3">N/A</td>
+                                <td class="p-3"><span class="bg-rose-50 text-rose-700 border border-rose-200 px-2 py-0.5 rounded">Coverage Gap</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Coverage Gap Research Callout -->
+            <div class="bg-slate-100 p-4 rounded-lg border border-slate-300 text-xs text-slate-600 leading-relaxed">
+                <span class="font-bold text-slate-800">Analytical Research Note on Global Coverage Gap:</span> The absence of active initiation reports from tier-one global investment banks (Morgan Stanley, Goldman Sachs, J.P. Morgan, UBS) is a standard structural characteristic of recent Indian mid-cap listings. High promoter holding (78.46%) leaves a free float of ~21.5%, resulting in daily trading volumes below institutional global liquidity thresholds. Domestic DIIs and HNIs remain the primary drivers of price discovery.
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-semibold text-slate-300">Happy Forgings Ltd Equity Research Intelligence Platform (FY26–FY27)</p>
+                <p class="text-slate-500 mt-0.5">Synthesized from NSE/BSE corporate filings, concall transcripts, and verified institutional research reports.</p>
+            </div>
+            <div class="text-slate-500">
+                Institutional Equity Research Database • Single-Page Interactive Application
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // Tab Navigation Switcher Logic
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Remove active style from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-white', 'border-blue-500');
+                btn.classList.add('text-slate-400', 'border-transparent');
+            });
+
+            // Show selected content
+            const targetSection = document.getElementById(`sec-${tabId}`);
+            if (targetSection) targetSection.classList.remove('hidden');
+
+            // Highlight selected button
+            const targetBtn = document.getElementById(`tab-${tabId}`);
+            if (targetBtn) {
+                targetBtn.classList.add('text-white', 'border-blue-500');
+                targetBtn.classList.remove('text-slate-400', 'border-transparent');
+            }
+        }
+
+        // Global Financial Chart Object
+        let financialChartInstance = null;
+
+        // Data Store for Financial Chart
+        const financialData = {
+            labels: ['FY24 Act', 'FY25 Act', 'FY26 Act', 'Q1 FY27', 'FY27E', 'FY28E', 'FY29E'],
+            revenue: [1358.2, 1408.9, 1546.3, 449.4, 1982.6, 2245.0, 3000.2],
+            ebitda: [387.5, 406.7, 470.7, 141.0, 628.4, 705.0, 985.0],
+            pat: [243.0, 267.6, 301.6, 91.5, 402.4, 485.0, 664.6],
+            eps: [25.80, 28.40, 31.97, 9.70, 42.60, 51.50, 70.50],
+            margins: [28.5, 28.9, 30.4, 31.3, 31.7, 31.7, 32.8]
+        };
+
+        // Render Financial Trajectory Chart
+        function renderFinancialChart(metricType = 'revenue') {
+            const ctx = document.getElementById('chart-financial-main').getContext('2d');
+            
+            if (financialChartInstance) {
+                financialChartInstance.destroy();
+            }
+
+            let datasets = [];
+
+            if (metricType === 'revenue') {
+                datasets = [
+                    {
+                        type: 'bar',
+                        label: 'Revenue from Operations (₹ Cr)',
+                        data: financialData.revenue,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    },
+                    {
+                        type: 'bar',
+                        label: 'EBITDA (₹ Cr)',
+                        data: financialData.ebitda,
+                        backgroundColor: '#1d4ed8',
+                        borderRadius: 4
+                    }
+                ];
+            } else if (metricType === 'profitability') {
+                datasets = [
+                    {
+                        type: 'bar',
+                        label: 'Profit After Tax (PAT ₹ Cr)',
+                        data: financialData.pat,
+                        backgroundColor: '#059669',
+                        borderRadius: 4
+                    },
+                    {
+                        type: 'line',
+                        label: 'Diluted EPS (₹)',
+                        data: financialData.eps,
+                        borderColor: '#d97706',
+                        backgroundColor: '#d97706',
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        yAxisID: 'y1'
+                    }
+                ];
+            } else if (metricType === 'margins') {
+                datasets = [
+                    {
+                        type: 'line',
+                        label: 'EBITDA Margin (%)',
+                        data: financialData.margins,
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        fill: true,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        tension: 0.2
+                    }
+                ];
+            }
+
+            financialChartInstance = new Chart(ctx, {
+                data: {
+                    labels: financialData.labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            title: { display: true, text: metricType === 'margins' ? 'Percentage (%)' : 'Amount (₹ Cr)' }
+                        },
+                        ...(metricType === 'profitability' ? {
+                            y1: {
+                                position: 'right',
+                                beginAtZero: true,
+                                grid: { drawOnChartArea: false },
+                                title: { display: true, text: 'EPS (₹)' }
+                            }
+                        } : {})
+                    }
+                }
+            });
+        }
+
+        // Toggle buttons for Financial Chart
+        function updateFinancialChart(type) {
+            ['revenue', 'profitability', 'margins'].forEach(t => {
+                const btn = document.getElementById(`btn-chart-${t}`);
+                if (t === type) {
+                    btn.className = "px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white shadow-sm";
+                } else {
+                    btn.className = "px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200";
+                }
+            });
+            renderFinancialChart(type);
+        }
+
+        // Target Price Sensitivity Calculation Tool
+        function calculateSensitivity() {
+            const epsInput = parseFloat(document.getElementById('calc-eps').value) || 51.5;
+            const peInput = parseFloat(document.getElementById('calc-pe').value) || 35;
+            
+            document.getElementById('calc-pe-val').innerText = peInput.toFixed(1) + 'x';
+            
+            const targetPrice = epsInput * peInput;
+            const currentPrice = 1320;
+            const upside = ((targetPrice - currentPrice) / currentPrice) * 100;
+
+            document.getElementById('calc-result-price').innerText = '₹' + targetPrice.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+            
+            const upsideEl = document.getElementById('calc-result-upside');
+            if (upside >= 0) {
+                upsideEl.innerText = `+${upside.toFixed(1)}% Upside from ₹1,320 Base`;
+                upsideEl.className = "text-xs font-medium text-emerald-400 mt-1 block";
+            } else {
+                upsideEl.innerText = `${upside.toFixed(1)}% Downside from ₹1,320 Base`;
+                upsideEl.className = "text-xs font-medium text-rose-400 mt-1 block";
+            }
+        }
+
+        // Filter Brokerage Database Table
+        function filterBrokerageTable() {
+            const query = document.getElementById('db-search').value.toLowerCase();
+            const selectedCat = document.getElementById('filter-cat').value;
+            const selectedRec = document.getElementById('filter-rec').value;
+
+            document.querySelectorAll('.db-row').forEach(row => {
+                const rowText = row.innerText.toLowerCase();
+                const rowCat = row.getAttribute('data-cat');
+                const rowRec = row.getAttribute('data-rec');
+
+                const matchesSearch = rowText.includes(query);
+                const matchesCat = (selectedCat === 'ALL' || rowCat === selectedCat);
+                const matchesRec = (selectedRec === 'ALL' || rowRec === selectedRec);
+
+                if (matchesSearch && matchesCat && matchesRec) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize All Dashboard Visualizations on Load
+        window.addEventListener('DOMContentLoaded', () => {
+
+            // 1. Executive Dashboard Growth Chart
+            const ctxDashGrowth = document.getElementById('chart-dashboard-growth').getContext('2d');
+            new Chart(ctxDashGrowth, {
+                type: 'bar',
+                data: {
+                    labels: ['FY24', 'FY25', 'FY26 Act', 'FY27E', 'FY28E', 'FY29E'],
+                    datasets: [
+                        {
+                            label: 'Revenue (₹ Cr)',
+                            data: [1358.2, 1408.9, 1546.3, 1982.6, 2245.0, 3000.2],
+                            backgroundColor: '#1e40af',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'PAT (₹ Cr)',
+                            data: [243.0, 267.6, 301.6, 402.4, 485.0, 664.6],
+                            backgroundColor: '#059669',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+                }
+            });
+
+            // 2. Executive Dashboard Mix Donut Chart
+            const ctxDashMix = document.getElementById('chart-dashboard-mix').getContext('2d');
+            new Chart(ctxDashMix, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Commercial Vehicles (CV)', 'Farm Equipment / Agri', 'Industrial & PV (Growing)'],
+                    datasets: [{
+                        data: [38, 32, 30],
+                        backgroundColor: ['#1e293b', '#d97706', '#059669'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${ctx.raw}% of Revenue`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3. Render Initial Financial Trajectory Chart
+            renderFinancialChart('revenue');
+
+            // 4. Target Price Divergence Horizontal Chart
+            const ctxValTargets = document.getElementById('chart-valuation-targets').getContext('2d');
+            new Chart(ctxValTargets, {
+                type: 'bar',
+                data: {
+                    labels: ['Ambit (SELL)', 'ICICI Sec (BUY)', 'Current Price', 'MNCL (HOLD)', 'Motilal Oswal (BUY)'],
+                    datasets: [{
+                        label: 'Target Price (₹)',
+                        data: [817, 1300, 1320, 1875, 2438],
+                        backgroundColor: ['#e11d48', '#3b82f6', '#64748b', '#d97706', '#059669'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+                }
+            });
+
+            // 5. Peer Group ROCE vs PE Chart
+            const ctxValPeers = document.getElementById('chart-valuation-peers').getContext('2d');
+            new Chart(ctxValPeers, {
+                type: 'bar',
+                data: {
+                    labels: ['Happy Forgings', 'Bharat Forge', 'Ramkrishna Forgings', 'Balu Forge', 'MM Forgings'],
+                    datasets: [
+                        {
+                            label: 'ROCE (%)',
+                            data: [18.2, 9.8, 6.1, 17.4, 9.5],
+                            backgroundColor: '#059669',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Trailing P/E (x)',
+                            data: [60.8, 117.4, 111.4, 32.5, 20.5],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } } }
+                }
+            });
+
+            // Initialize Sensitivity Tool Calculation
+            calculateSensitivity();
+        });
+    </script>
+</body>
+</html>
